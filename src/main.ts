@@ -99,27 +99,23 @@ const INLINE_STYLE_PROPERTIES = [
 	"word-break"
 ];
 
-const OBSIDIAN_RUNTIME_CONTROL_SELECTORS = [
-	"button",
-	"[role='button']",
-	"[aria-label*='Copy']",
-	"[aria-label*='copy']",
-	"[aria-label*='复制']",
-	"[title*='Copy']",
-	"[title*='copy']",
-	"[title*='复制']",
-	".clickable-icon",
-	".mod-clickable",
+const OBSIDIAN_CODE_COPY_CONTROL_SELECTORS = [
 	".copy-code-button",
+	"button.copy-code-button",
 	".code-block-copy-button",
+	"button.code-block-copy-button",
 	".clipboard-button",
+	"button.clipboard-button",
 	".copy-button",
+	"button.copy-button",
 	".code-copy-button",
-	".lucide-copy",
-	".svg-icon.lucide-copy",
-	".heading-collapse-indicator",
-	".collapse-indicator",
-	".callout-icon",
+	"button.code-copy-button",
+	"button[aria-label='Copy code']",
+	"button[aria-label='Copy Code']",
+	"button[aria-label='复制代码']",
+	"button[title='Copy code']",
+	"button[title='Copy Code']",
+	"button[title='复制代码']",
 	"pre > button",
 	"pre + button",
 	"pre ~ button"
@@ -847,23 +843,22 @@ function transformWechatArticle(root: HTMLElement) {
 function removeObsidianRuntimeControls(root: HTMLElement) {
 	const controls = new Set<Element>();
 
-	for (const selector of OBSIDIAN_RUNTIME_CONTROL_SELECTORS) {
+	for (const selector of OBSIDIAN_CODE_COPY_CONTROL_SELECTORS) {
 		for (const element of Array.from(root.querySelectorAll(selector))) {
 			controls.add(element);
 		}
 	}
 
-	for (const element of Array.from(root.querySelectorAll<HTMLElement>("*"))) {
+	for (const button of Array.from(root.querySelectorAll<HTMLButtonElement>("button"))) {
 		const label = [
-			element.className,
-			element.getAttribute("aria-label"),
-			element.getAttribute("title"),
-			element.getAttribute("data-tooltip-position"),
-			element.textContent
+			button.className,
+			button.getAttribute("aria-label"),
+			button.getAttribute("title"),
+			button.textContent
 		].join(" ");
 
-		if (/copy|clipboard|复制/i.test(label) && isRuntimeControlElement(element)) {
-			controls.add(element);
+		if (/copy|clipboard|复制/i.test(label) && isNearCodeBlock(button)) {
+			controls.add(button);
 		}
 	}
 
@@ -879,19 +874,13 @@ function removeObsidianRuntimeControls(root: HTMLElement) {
 		].join(" ");
 
 		if (/copy|clipboard|复制/i.test(label) && isNearCodeBlock(svg)) {
-			controls.add(svg.closest("button,[role='button'],.clickable-icon,.mod-clickable") ?? svg);
+			controls.add(svg.closest("button,.copy-code-button,.code-block-copy-button,.clipboard-button,.copy-button,.code-copy-button") ?? svg);
 		}
 	}
 
 	for (const control of controls) {
 		control.remove();
 	}
-}
-
-function isRuntimeControlElement(element: HTMLElement): boolean {
-	return element.matches("button,[role='button'],.clickable-icon,.mod-clickable")
-		|| isNearCodeBlock(element)
-		|| element.children.length === 1 && element.firstElementChild?.tagName.toLowerCase() === "svg";
 }
 
 function isNearCodeBlock(element: Element): boolean {
