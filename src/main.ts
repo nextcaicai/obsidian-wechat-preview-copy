@@ -99,6 +99,16 @@ const INLINE_STYLE_PROPERTIES = [
 	"word-break"
 ];
 
+const OBSIDIAN_RUNTIME_CONTROL_SELECTORS = [
+	".copy-code-button",
+	".code-block-copy-button",
+	".clipboard-button",
+	".heading-collapse-indicator",
+	".collapse-indicator",
+	".callout-icon",
+	"pre > button"
+];
+
 const PLATFORM_PROFILES: Record<CopyPlatform, PlatformProfile> = {
 	wechat: {
 		id: "wechat",
@@ -576,6 +586,7 @@ class WeChatPreviewCopyView extends ItemView {
 			? await this.embedLocalImages(clone)
 			: 0;
 
+		removeObsidianRuntimeControls(clone);
 		replaceTaskCheckboxes(clone);
 		removeObsidianRuntimeAttributes(clone);
 
@@ -797,6 +808,26 @@ function transformWechatArticle(root: HTMLElement) {
 
 	for (const paragraph of Array.from(root.querySelectorAll<HTMLElement>("p:empty"))) {
 		paragraph.remove();
+	}
+}
+
+function removeObsidianRuntimeControls(root: HTMLElement) {
+	for (const selector of OBSIDIAN_RUNTIME_CONTROL_SELECTORS) {
+		for (const element of Array.from(root.querySelectorAll(selector))) {
+			element.remove();
+		}
+	}
+
+	for (const button of Array.from(root.querySelectorAll<HTMLButtonElement>("button"))) {
+		const label = [
+			button.getAttribute("aria-label"),
+			button.getAttribute("title"),
+			button.textContent
+		].join(" ");
+
+		if (/copy|复制/i.test(label) && button.closest("pre")) {
+			button.remove();
+		}
 	}
 }
 

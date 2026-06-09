@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-wechat-preview",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Preview the active Obsidian note in the right sidebar and copy rich HTML for WeChat Official Account.",
 	"main": "main.js",
 	"scripts": {
