@@ -44,3 +44,18 @@
 	height: auto;
 	max-width: 100%;
 }
+
+.wechat-preview-copy-content button,
+.wechat-preview-copy-content [role='button'],
+.wechat-preview-copy-content .copy-code-button,
+.wechat-preview-copy-content .code-block-copy-button,
+.wechat-preview-copy-content .clipboard-button,
+.wechat-preview-copy-content .copy-button,
+.wechat-preview-copy-content .code-copy-button,
+.wechat-preview-copy-content .clickable-icon,
+.wechat-preview-copy-content .mod-clickable,
+.wechat-preview-copy-content .heading-collapse-indicator,
+.wechat-preview-copy-content .collapse-indicator,
+.wechat-preview-copy-content .callout-icon {
+	display: none !important;
+}

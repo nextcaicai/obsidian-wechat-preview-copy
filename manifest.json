@@ -1,7 +1,7 @@
 {
 	"id": "wechat-preview-copy",
 	"name": "WeChat Preview Copy",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"minAppVersion": "1.5.0",
 	"description": "Preview the active note in the right sidebar and copy rich HTML with embedded images for WeChat Official Account.",
 	"author": "",

@@ -555,6 +555,7 @@ class WeChatPreviewCopyView extends ItemView {
 			file.path,
 			this.renderComponent
 		);
+		this.removePreviewRuntimeControls(serial);
 	}
 
 	async copyForWeChat() {
@@ -649,6 +650,22 @@ class WeChatPreviewCopyView extends ItemView {
 		}
 
 		return unresolved;
+	}
+
+	private removePreviewRuntimeControls(serial: number) {
+		removeObsidianRuntimeControls(this.previewEl);
+
+		window.requestAnimationFrame(() => {
+			if (serial === this.renderSerial) {
+				removeObsidianRuntimeControls(this.previewEl);
+			}
+		});
+
+		window.setTimeout(() => {
+			if (serial === this.renderSerial) {
+				removeObsidianRuntimeControls(this.previewEl);
+			}
+		}, 100);
 	}
 
 	private resolveEmbeddedImageFiles(): TFile[] {
