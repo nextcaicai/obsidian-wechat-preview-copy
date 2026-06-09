@@ -14,17 +14,35 @@ import {
 
 const VIEW_TYPE_WECHAT_PREVIEW = "wechat-preview-copy-view";
 
+type CopyPlatform = "wechat";
+
 interface WeChatPreviewCopySettings {
 	autoOpen: boolean;
 	embedLocalImages: boolean;
 	inlineStyles: boolean;
+	targetPlatform: CopyPlatform;
 }
 
 const DEFAULT_SETTINGS: WeChatPreviewCopySettings = {
 	autoOpen: true,
 	embedLocalImages: true,
-	inlineStyles: true
+	inlineStyles: true,
+	targetPlatform: "wechat"
 };
+
+interface PlatformProfile {
+	id: CopyPlatform;
+	label: string;
+	wrapperStyle: string;
+	rules: PlatformStyleRule[];
+	transform?: (root: HTMLElement) => void;
+}
+
+interface PlatformStyleRule {
+	selector: string;
+	style?: string;
+	remove?: boolean;
+}
 
 const IMAGE_MIME_BY_EXTENSION: Record<string, string> = {
 	avif: "image/avif",
@@ -80,6 +98,124 @@ const INLINE_STYLE_PROPERTIES = [
 	"white-space",
 	"word-break"
 ];
+
+const PLATFORM_PROFILES: Record<CopyPlatform, PlatformProfile> = {
+	wechat: {
+		id: "wechat",
+		label: "WeChat Official Account",
+		wrapperStyle: [
+			"box-sizing:border-box",
+			"color:#3f3f3f",
+			"font-family:-apple-system,BlinkMacSystemFont,\"Helvetica Neue\",Helvetica,\"PingFang SC\",\"Microsoft YaHei\",Arial,sans-serif",
+			"font-size:16px",
+			"letter-spacing:0",
+			"line-height:1.75",
+			"margin:0 auto",
+			"max-width:677px",
+			"overflow-wrap:break-word",
+			"word-break:break-word"
+		].join(";"),
+		rules: [
+			{
+				selector: "h1",
+				style: "border-bottom:1px solid #e5e6eb;color:#1d2129;font-size:24px;font-weight:700;line-height:1.35;margin:1.4em 0 0.8em;padding:0 0 0.35em;"
+			},
+			{
+				selector: "h2",
+				style: "border-left:4px solid #1e80ff;color:#1d2129;font-size:20px;font-weight:700;line-height:1.45;margin:1.8em 0 0.8em;padding:0 0 0 12px;"
+			},
+			{
+				selector: "h3",
+				style: "color:#1d2129;font-size:18px;font-weight:700;line-height:1.5;margin:1.5em 0 0.7em;"
+			},
+			{
+				selector: "h4,h5,h6",
+				style: "color:#1d2129;font-size:16px;font-weight:700;line-height:1.5;margin:1.2em 0 0.6em;"
+			},
+			{
+				selector: "p",
+				style: "color:#3f3f3f;font-size:16px;line-height:1.8;margin:1em 0;"
+			},
+			{
+				selector: "strong",
+				style: "color:#1d2129;font-weight:700;"
+			},
+			{
+				selector: "em",
+				style: "color:#4e5969;font-style:italic;"
+			},
+			{
+				selector: "a",
+				style: "color:#576b95;text-decoration:none;"
+			},
+			{
+				selector: "ul,ol",
+				style: "margin:1em 0;padding-left:1.4em;"
+			},
+			{
+				selector: "li",
+				style: "color:#3f3f3f;line-height:1.8;margin:0.35em 0;"
+			},
+			{
+				selector: "blockquote",
+				style: "background:#f7f8fa;border-left:4px solid #d0d7de;color:#57606a;margin:1.2em 0;padding:12px 16px;"
+			},
+			{
+				selector: "blockquote p",
+				style: "color:#57606a;margin:0.6em 0;"
+			},
+			{
+				selector: "code",
+				style: "background:#f6f8fa;border-radius:4px;color:#d6336c;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",monospace;font-size:0.9em;padding:2px 4px;"
+			},
+			{
+				selector: "pre",
+				style: "background:#f6f8fa;border-radius:6px;box-sizing:border-box;color:#24292f;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",monospace;font-size:14px;line-height:1.65;margin:1.2em 0;overflow-x:auto;padding:12px 14px;white-space:pre-wrap;word-break:break-word;"
+			},
+			{
+				selector: "pre code",
+				style: "background:transparent;color:#24292f;font-size:14px;line-height:1.65;padding:0;"
+			},
+			{
+				selector: "table",
+				style: "border-collapse:collapse;border-spacing:0;margin:1.2em 0;width:100%;"
+			},
+			{
+				selector: "th,td",
+				style: "border:1px solid #d8dee4;color:#3f3f3f;font-size:15px;line-height:1.6;padding:8px 10px;text-align:left;vertical-align:top;"
+			},
+			{
+				selector: "th",
+				style: "background:#f6f8fa;color:#1d2129;font-weight:700;"
+			},
+			{
+				selector: "img",
+				style: "border-radius:4px;display:block;height:auto;margin:16px auto;max-width:100%;"
+			},
+			{
+				selector: "hr",
+				style: "border:0;border-top:1px solid #e5e6eb;margin:2em 0;"
+			},
+			{
+				selector: ".callout",
+				style: "background:#f7fbff;border-left:4px solid #1e80ff;border-radius:6px;box-sizing:border-box;color:#3f3f3f;margin:1.2em 0;padding:12px 16px;"
+			},
+			{
+				selector: ".callout-title",
+				style: "color:#1d2129;font-size:16px;font-weight:700;line-height:1.6;margin:0 0 6px;"
+			},
+			{
+				selector: ".callout-content",
+				style: "color:#3f3f3f;font-size:16px;line-height:1.8;"
+			},
+			{
+				selector: ".callout-icon,.heading-collapse-indicator,.collapse-indicator",
+				remove: true
+			}
+		],
+		transform: transformWechatArticle
+	}
+};
 
 export default class WeChatPreviewCopyPlugin extends Plugin {
 	settings: WeChatPreviewCopySettings = DEFAULT_SETTINGS;
@@ -434,6 +570,8 @@ class WeChatPreviewCopyView extends ItemView {
 			inlineComputedStyles(this.previewEl, clone);
 		}
 
+		applyPlatformProfile(clone, this.plugin.settings.targetPlatform);
+
 		const unresolvedImages = this.plugin.settings.embedLocalImages
 			? await this.embedLocalImages(clone)
 			: 0;
@@ -441,7 +579,7 @@ class WeChatPreviewCopyView extends ItemView {
 		replaceTaskCheckboxes(clone);
 		removeObsidianRuntimeAttributes(clone);
 
-		const fragment = clone.innerHTML;
+		const fragment = wrapPlatformFragment(clone.innerHTML, this.plugin.settings.targetPlatform);
 		return {
 			fragment,
 			html: wrapHtmlDocument(fragment),
@@ -579,6 +717,24 @@ class WeChatPreviewCopySettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl)
+			.setName("Copy profile")
+			.setDesc("Choose the target platform formatting profile.")
+			.addDropdown((dropdown) => {
+				for (const profile of Object.values(PLATFORM_PROFILES)) {
+					dropdown.addOption(profile.id, profile.label);
+				}
+
+				dropdown
+					.setValue(this.plugin.settings.targetPlatform)
+					.onChange(async (value) => {
+						if (isCopyPlatform(value)) {
+							this.plugin.settings.targetPlatform = value;
+							await this.plugin.saveSettings();
+						}
+					});
+			});
+
+		new Setting(containerEl)
 			.setName("Embed local images")
 			.setDesc("Convert vault images to data URLs before copying.")
 			.addToggle((toggle) => toggle
@@ -589,8 +745,8 @@ class WeChatPreviewCopySettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl)
-			.setName("Inline styles")
-			.setDesc("Copy key computed styles as inline CSS for WeChat paste compatibility.")
+			.setName("Inline source styles")
+			.setDesc("Copy key computed styles before applying the target platform profile.")
 			.addToggle((toggle) => toggle
 				.setValue(this.plugin.settings.inlineStyles)
 				.onChange(async (value) => {
@@ -606,6 +762,50 @@ function isImageFile(file: TFile): boolean {
 
 function isPortableImageSource(src: string): boolean {
 	return src.startsWith("data:") || src.startsWith("http://") || src.startsWith("https://");
+}
+
+function isCopyPlatform(value: string): value is CopyPlatform {
+	return value in PLATFORM_PROFILES;
+}
+
+function applyPlatformProfile(root: HTMLElement, platform: CopyPlatform) {
+	const profile = PLATFORM_PROFILES[platform];
+
+	for (const rule of profile.rules) {
+		for (const element of Array.from(root.querySelectorAll(rule.selector))) {
+			if (!(element instanceof HTMLElement)) {
+				continue;
+			}
+
+			if (rule.remove) {
+				element.remove();
+			} else if (rule.style) {
+				appendInlineStyle(element, rule.style);
+			}
+		}
+	}
+
+	profile.transform?.(root);
+}
+
+function transformWechatArticle(root: HTMLElement) {
+	for (const link of Array.from(root.querySelectorAll<HTMLAnchorElement>("a.internal-link"))) {
+		link.removeAttribute("href");
+		link.setAttribute("title", "Internal Obsidian link");
+		appendInlineStyle(link, "color:#3f3f3f;text-decoration:none;");
+	}
+
+	for (const paragraph of Array.from(root.querySelectorAll<HTMLElement>("p:empty"))) {
+		paragraph.remove();
+	}
+}
+
+function wrapPlatformFragment(fragment: string, platform: CopyPlatform): string {
+	const profile = PLATFORM_PROFILES[platform];
+	const wrapper = document.createElement("section");
+	wrapper.setAttribute("style", profile.wrapperStyle);
+	wrapper.innerHTML = fragment;
+	return wrapper.outerHTML;
 }
 
 function normalizeImageLink(link: string): string {

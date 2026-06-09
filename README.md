@@ -7,8 +7,19 @@ An Obsidian plugin that opens a right-sidebar preview for the active Markdown no
 - Preview the currently active Markdown note in a right sidebar view.
 - Keep the preview synchronized with the active file and editor changes.
 - Copy rendered HTML to the clipboard with inline styles.
+- Apply a target-platform copy profile. The first profile is tuned for WeChat Official Account article layout.
 - Embed local vault images as `data:` URLs so the clipboard does not depend on Obsidian local resource paths.
 - Also writes a Markdown/plain-text fallback to the clipboard.
+
+## Copy profiles
+
+The copy pipeline renders Markdown with Obsidian first, then applies a target-platform profile before writing HTML to the clipboard. A profile owns the platform-specific inline styles and DOM cleanup rules for headings, paragraphs, lists, tables, code blocks, images, callouts, and links.
+
+Current profile:
+
+- `wechat`: WeChat Official Account article layout.
+
+Future platforms can be added by extending `PLATFORM_PROFILES` in `src/main.ts`.
 
 ## Development
 
