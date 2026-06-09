@@ -100,13 +100,29 @@ const INLINE_STYLE_PROPERTIES = [
 ];
 
 const OBSIDIAN_RUNTIME_CONTROL_SELECTORS = [
+	"button",
+	"[role='button']",
+	"[aria-label*='Copy']",
+	"[aria-label*='copy']",
+	"[aria-label*='复制']",
+	"[title*='Copy']",
+	"[title*='copy']",
+	"[title*='复制']",
+	".clickable-icon",
+	".mod-clickable",
 	".copy-code-button",
 	".code-block-copy-button",
 	".clipboard-button",
+	".copy-button",
+	".code-copy-button",
+	".lucide-copy",
+	".svg-icon.lucide-copy",
 	".heading-collapse-indicator",
 	".collapse-indicator",
 	".callout-icon",
-	"pre > button"
+	"pre > button",
+	"pre + button",
+	"pre ~ button"
 ];
 
 const PLATFORM_PROFILES: Record<CopyPlatform, PlatformProfile> = {
@@ -812,23 +828,67 @@ function transformWechatArticle(root: HTMLElement) {
 }
 
 function removeObsidianRuntimeControls(root: HTMLElement) {
+	const controls = new Set<Element>();
+
 	for (const selector of OBSIDIAN_RUNTIME_CONTROL_SELECTORS) {
 		for (const element of Array.from(root.querySelectorAll(selector))) {
-			element.remove();
+			controls.add(element);
 		}
 	}
 
-	for (const button of Array.from(root.querySelectorAll<HTMLButtonElement>("button"))) {
+	for (const element of Array.from(root.querySelectorAll<HTMLElement>("*"))) {
 		const label = [
-			button.getAttribute("aria-label"),
-			button.getAttribute("title"),
-			button.textContent
+			element.className,
+			element.getAttribute("aria-label"),
+			element.getAttribute("title"),
+			element.getAttribute("data-tooltip-position"),
+			element.textContent
 		].join(" ");
 
-		if (/copy|复制/i.test(label) && button.closest("pre")) {
-			button.remove();
+		if (/copy|clipboard|复制/i.test(label) && isRuntimeControlElement(element)) {
+			controls.add(element);
 		}
 	}
+
+	for (const svg of Array.from(root.querySelectorAll<SVGElement>("svg"))) {
+		const label = [
+			svg.getAttribute("class"),
+			svg.getAttribute("aria-label"),
+			svg.getAttribute("data-icon"),
+			svg.getAttribute("icon-name"),
+			svg.parentElement?.className,
+			svg.parentElement?.getAttribute("aria-label"),
+			svg.parentElement?.getAttribute("title")
+		].join(" ");
+
+		if (/copy|clipboard|复制/i.test(label) && isNearCodeBlock(svg)) {
+			controls.add(svg.closest("button,[role='button'],.clickable-icon,.mod-clickable") ?? svg);
+		}
+	}
+
+	for (const control of controls) {
+		control.remove();
+	}
+}
+
+function isRuntimeControlElement(element: HTMLElement): boolean {
+	return element.matches("button,[role='button'],.clickable-icon,.mod-clickable")
+		|| isNearCodeBlock(element)
+		|| element.children.length === 1 && element.firstElementChild?.tagName.toLowerCase() === "svg";
+}
+
+function isNearCodeBlock(element: Element): boolean {
+	const parent = element.parentElement;
+	if (!parent) {
+		return false;
+	}
+
+	return Boolean(
+		element.closest("pre")
+		|| parent.querySelector("pre")
+		|| element.previousElementSibling?.tagName.toLowerCase() === "pre"
+		|| element.nextElementSibling?.tagName.toLowerCase() === "pre"
+	);
 }
 
 function wrapPlatformFragment(fragment: string, platform: CopyPlatform): string {
