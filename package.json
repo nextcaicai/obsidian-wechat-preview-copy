@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-wechat-preview",
 	"version": "0.1.5",
-	"description": "Preview the active Obsidian note in the right sidebar and copy rich HTML for WeChat Official Account.",
+	"description": "Preview the active Obsidian note in the right sidebar and copy rich HTML for publishing platforms.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
@@ -11,6 +11,7 @@
 		"obsidian",
 		"obsidian-plugin",
 		"wechat",
+		"zhishixingqiu",
 		"markdown"
 	],
 	"author": "",

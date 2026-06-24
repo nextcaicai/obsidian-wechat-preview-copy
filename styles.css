@@ -16,6 +16,11 @@
 	flex: 0 0 auto;
 }
 
+.wechat-preview-copy-toolbar select {
+	flex: 0 0 auto;
+	max-width: 160px;
+}
+
 .wechat-preview-copy-status {
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);

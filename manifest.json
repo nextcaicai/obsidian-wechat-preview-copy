@@ -3,7 +3,7 @@
 	"name": "WeChat Preview Copy",
 	"version": "0.1.5",
 	"minAppVersion": "1.5.0",
-	"description": "Preview the active note in the right sidebar and copy rich HTML with embedded images for WeChat Official Account.",
+	"description": "Preview the active note in the right sidebar and copy rich HTML with embedded images for publishing platforms.",
 	"author": "",
 	"authorUrl": "",
 	"isDesktopOnly": false

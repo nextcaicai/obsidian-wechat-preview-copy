@@ -14,7 +14,7 @@ import {
 
 const VIEW_TYPE_WECHAT_PREVIEW = "wechat-preview-copy-view";
 
-type CopyPlatform = "wechat";
+type CopyPlatform = "wechat" | "zhishixingqiu";
 
 interface WeChatPreviewCopySettings {
 	autoOpen: boolean;
@@ -33,6 +33,7 @@ const DEFAULT_SETTINGS: WeChatPreviewCopySettings = {
 interface PlatformProfile {
 	id: CopyPlatform;
 	label: string;
+	copyLabel: string;
 	wrapperStyle: string;
 	rules: PlatformStyleRule[];
 	transform?: (root: HTMLElement) => void;
@@ -125,6 +126,7 @@ const PLATFORM_PROFILES: Record<CopyPlatform, PlatformProfile> = {
 	wechat: {
 		id: "wechat",
 		label: "WeChat Official Account",
+		copyLabel: "WeChat",
 		wrapperStyle: [
 			"box-sizing:border-box",
 			"color:#3f3f3f",
@@ -236,6 +238,122 @@ const PLATFORM_PROFILES: Record<CopyPlatform, PlatformProfile> = {
 			}
 		],
 		transform: transformWechatArticle
+	},
+	zhishixingqiu: {
+		id: "zhishixingqiu",
+		label: "知识星球",
+		copyLabel: "知识星球",
+		wrapperStyle: [
+			"box-sizing:border-box",
+			"color:#2f3033",
+			"font-family:-apple-system,BlinkMacSystemFont,\"Helvetica Neue\",Helvetica,\"PingFang SC\",\"Microsoft YaHei\",Arial,sans-serif",
+			"font-size:16px",
+			"letter-spacing:0",
+			"line-height:1.75",
+			"margin:0",
+			"max-width:100%",
+			"overflow-wrap:break-word",
+			"word-break:break-word"
+		].join(";"),
+		rules: [
+			{
+				selector: "h1",
+				style: "color:#1d2129;font-size:24px;font-weight:700;line-height:1.4;margin:1.2em 0 0.8em;"
+			},
+			{
+				selector: "h2",
+				style: "color:#1d2129;font-size:21px;font-weight:700;line-height:1.45;margin:1.4em 0 0.75em;"
+			},
+			{
+				selector: "h3",
+				style: "color:#1d2129;font-size:18px;font-weight:700;line-height:1.5;margin:1.2em 0 0.65em;"
+			},
+			{
+				selector: "h4,h5,h6",
+				style: "color:#1d2129;font-size:16px;font-weight:700;line-height:1.5;margin:1em 0 0.55em;"
+			},
+			{
+				selector: "p",
+				style: "color:#2f3033;font-size:16px;line-height:1.8;margin:0;"
+			},
+			{
+				selector: "strong",
+				style: "color:#1d2129;font-weight:700;"
+			},
+			{
+				selector: "em",
+				style: "color:#515866;font-style:italic;"
+			},
+			{
+				selector: "a",
+				style: "color:#246bfe;text-decoration:none;"
+			},
+			{
+				selector: "ul,ol",
+				style: "margin:0;padding-left:1.4em;"
+			},
+			{
+				selector: "li",
+				style: "color:#2f3033;line-height:1.8;margin:0.2em 0;"
+			},
+			{
+				selector: "blockquote",
+				style: "background:#f7f8fa;border-left:4px solid #d7dce5;color:#515866;margin:0;padding:12px 16px;"
+			},
+			{
+				selector: "blockquote p",
+				style: "color:#515866;margin:0;"
+			},
+			{
+				selector: "code",
+				style: "background:#f5f6f8;border-radius:4px;color:#d6336c;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",monospace;font-size:0.9em;padding:2px 4px;"
+			},
+			{
+				selector: "pre",
+				style: "background:#f5f6f8;border-radius:6px;box-sizing:border-box;color:#24292f;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",monospace;font-size:14px;line-height:1.65;margin:0;overflow-x:auto;padding:12px 14px;white-space:pre-wrap;word-break:break-word;"
+			},
+			{
+				selector: "pre code",
+				style: "background:transparent;color:#24292f;font-size:14px;line-height:1.65;padding:0;"
+			},
+			{
+				selector: "table",
+				style: "border-collapse:collapse;border-spacing:0;margin:0;width:100%;"
+			},
+			{
+				selector: "th,td",
+				style: "border:1px solid #d8dee4;color:#2f3033;font-size:15px;line-height:1.6;padding:8px 10px;text-align:left;vertical-align:top;"
+			},
+			{
+				selector: "th",
+				style: "background:#f5f6f8;color:#1d2129;font-weight:700;"
+			},
+			{
+				selector: "img",
+				style: "border-radius:4px;display:block;height:auto;margin:0 auto;max-width:100%;"
+			},
+			{
+				selector: "hr",
+				style: "border:0;border-top:1px solid #e5e6eb;margin:0;"
+			},
+			{
+				selector: ".callout",
+				style: "background:#f7fbff;border-left:4px solid #246bfe;border-radius:6px;box-sizing:border-box;color:#2f3033;margin:0;padding:12px 16px;"
+			},
+			{
+				selector: ".callout-title",
+				style: "color:#1d2129;font-size:16px;font-weight:700;line-height:1.6;margin:0 0 6px;"
+			},
+			{
+				selector: ".callout-content",
+				style: "color:#2f3033;font-size:16px;line-height:1.8;"
+			},
+			{
+				selector: ".callout-icon,.heading-collapse-indicator,.collapse-indicator",
+				remove: true
+			}
+		],
+		transform: transformZhishixingqiuArticle
 	}
 };
 
@@ -253,15 +371,23 @@ export default class WeChatPreviewCopyPlugin extends Plugin {
 			(leaf) => new WeChatPreviewCopyView(leaf, this)
 		);
 
-		this.addRibbonIcon("copy", "Open WeChat preview", () => {
+		this.addRibbonIcon("copy", "Open copy preview", () => {
 			void this.activateView();
 		});
 
 		this.addCommand({
-			id: "open-wechat-preview",
-			name: "Open WeChat preview in right sidebar",
+			id: "open-copy-preview",
+			name: "Open copy preview in right sidebar",
 			callback: () => {
 				void this.activateView();
+			}
+		});
+
+		this.addCommand({
+			id: "copy-current-note-for-target-platform",
+			name: "Copy current note for target platform",
+			callback: () => {
+				void this.copyCurrentNoteForTargetPlatform();
 			}
 		});
 
@@ -269,7 +395,15 @@ export default class WeChatPreviewCopyPlugin extends Plugin {
 			id: "copy-current-note-for-wechat",
 			name: "Copy current note for WeChat",
 			callback: () => {
-				void this.copyCurrentNoteForWeChat();
+				void this.copyCurrentNoteForPlatform("wechat");
+			}
+		});
+
+		this.addCommand({
+			id: "copy-current-note-for-zhishixingqiu",
+			name: "Copy current note for 知识星球",
+			callback: () => {
+				void this.copyCurrentNoteForPlatform("zhishixingqiu");
 			}
 		});
 
@@ -320,13 +454,32 @@ export default class WeChatPreviewCopyPlugin extends Plugin {
 		}
 	}
 
-	async copyCurrentNoteForWeChat() {
+	async copyCurrentNoteForTargetPlatform() {
 		const leaf = await this.getOrCreatePreviewLeaf();
 		this.app.workspace.revealLeaf(leaf);
 
 		if (leaf.view instanceof WeChatPreviewCopyView) {
 			await leaf.view.renderActiveFile();
-			await leaf.view.copyForWeChat();
+			await leaf.view.copyForCurrentPlatform();
+		}
+	}
+
+	async copyCurrentNoteForPlatform(platform: CopyPlatform) {
+		await this.setTargetPlatform(platform);
+		await this.copyCurrentNoteForTargetPlatform();
+	}
+
+	getCurrentPlatformProfile(): PlatformProfile {
+		return PLATFORM_PROFILES[this.settings.targetPlatform];
+	}
+
+	async setTargetPlatform(platform: CopyPlatform) {
+		this.settings.targetPlatform = platform;
+		await this.saveSettings();
+		for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE_WECHAT_PREVIEW)) {
+			if (leaf.view instanceof WeChatPreviewCopyView) {
+				leaf.view.syncPlatformControls();
+			}
 		}
 	}
 
@@ -458,6 +611,8 @@ export default class WeChatPreviewCopyPlugin extends Plugin {
 class WeChatPreviewCopyView extends ItemView {
 	private currentFile: TFile | null = null;
 	private currentMarkdown = "";
+	private copyButton!: HTMLButtonElement;
+	private platformSelect!: HTMLSelectElement;
 	private previewEl!: HTMLElement;
 	private renderComponent: Component | null = null;
 	private renderSerial = 0;
@@ -475,7 +630,7 @@ class WeChatPreviewCopyView extends ItemView {
 	}
 
 	getDisplayText() {
-		return "WeChat Preview";
+		return "Copy Preview";
 	}
 
 	getIcon() {
@@ -488,12 +643,25 @@ class WeChatPreviewCopyView extends ItemView {
 
 		const toolbarEl = this.contentEl.createDiv({ cls: "wechat-preview-copy-toolbar" });
 
-		const copyButton = toolbarEl.createEl("button", {
-			cls: "mod-cta",
-			text: "Copy for WeChat"
+		this.platformSelect = toolbarEl.createEl("select");
+		for (const profile of Object.values(PLATFORM_PROFILES)) {
+			this.platformSelect.createEl("option", {
+				attr: { value: profile.id },
+				text: profile.label
+			});
+		}
+		this.platformSelect.addEventListener("change", () => {
+			if (isCopyPlatform(this.platformSelect.value)) {
+				void this.plugin.setTargetPlatform(this.platformSelect.value);
+			}
 		});
-		copyButton.addEventListener("click", () => {
-			void this.copyForWeChat();
+
+		this.copyButton = toolbarEl.createEl("button", {
+			cls: "mod-cta",
+			text: ""
+		});
+		this.copyButton.addEventListener("click", () => {
+			void this.copyForCurrentPlatform();
 		});
 
 		const refreshButton = toolbarEl.createEl("button", { text: "Refresh" });
@@ -505,8 +673,19 @@ class WeChatPreviewCopyView extends ItemView {
 		this.previewEl = this.contentEl.createDiv({
 			cls: "wechat-preview-copy-content markdown-rendered"
 		});
+		this.syncPlatformControls();
 
 		await this.renderActiveFile();
+	}
+
+	syncPlatformControls() {
+		if (!this.copyButton || !this.platformSelect) {
+			return;
+		}
+
+		const profile = this.plugin.getCurrentPlatformProfile();
+		this.platformSelect.value = profile.id;
+		this.copyButton.setText(`Copy for ${profile.copyLabel}`);
 	}
 
 	async onClose() {
@@ -554,7 +733,7 @@ class WeChatPreviewCopyView extends ItemView {
 		this.removePreviewRuntimeControls(serial);
 	}
 
-	async copyForWeChat() {
+	async copyForCurrentPlatform() {
 		if (!this.currentFile) {
 			new Notice("Open a Markdown note before copying.");
 			return;
@@ -570,10 +749,11 @@ class WeChatPreviewCopyView extends ItemView {
 			const clipboard = await this.buildClipboardPayload();
 			await writeRichClipboard(clipboard.html, clipboard.fragment, clipboard.text);
 
+			const profile = this.plugin.getCurrentPlatformProfile();
 			const suffix = clipboard.unresolvedImages === 0
 				? ""
 				: ` (${clipboard.unresolvedImages} image(s) could not be embedded)`;
-			new Notice(`Copied for WeChat${suffix}.`);
+			new Notice(`Copied for ${profile.copyLabel}${suffix}.`);
 		} catch (error) {
 			console.error(error);
 			new Notice("Copy failed. See console for details.");
@@ -768,8 +948,7 @@ class WeChatPreviewCopySettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.targetPlatform)
 					.onChange(async (value) => {
 						if (isCopyPlatform(value)) {
-							this.plugin.settings.targetPlatform = value;
-							await this.plugin.saveSettings();
+							await this.plugin.setTargetPlatform(value);
 						}
 					});
 			});
@@ -838,6 +1017,73 @@ function transformWechatArticle(root: HTMLElement) {
 	for (const paragraph of Array.from(root.querySelectorAll<HTMLElement>("p:empty"))) {
 		paragraph.remove();
 	}
+}
+
+function transformZhishixingqiuArticle(root: HTMLElement) {
+	for (const link of Array.from(root.querySelectorAll<HTMLAnchorElement>("a.internal-link"))) {
+		link.removeAttribute("href");
+		link.setAttribute("title", "Internal Obsidian link");
+		appendInlineStyle(link, "color:#2f3033;text-decoration:none;");
+	}
+
+	for (const paragraph of Array.from(root.querySelectorAll<HTMLElement>("p:empty"))) {
+		turnIntoZhishixingqiuSpacer(paragraph);
+	}
+
+	insertZhishixingqiuSpacers(root);
+}
+
+function insertZhishixingqiuSpacers(root: HTMLElement) {
+	const children = Array.from(root.children);
+
+	for (let index = 0; index < children.length - 1; index += 1) {
+		const current = children[index];
+		const next = children[index + 1];
+
+		if (!isZhishixingqiuBlock(current) || !isZhishixingqiuBlock(next)) {
+			continue;
+		}
+
+		const spacer = document.createElement("p");
+		turnIntoZhishixingqiuSpacer(spacer);
+		current.after(spacer);
+	}
+}
+
+function turnIntoZhishixingqiuSpacer(element: HTMLElement) {
+	element.innerHTML = "&nbsp;";
+	element.classList.add("zhishixingqiu-spacer");
+	element.setAttribute("style", [
+		"color:transparent",
+		"font-size:16px",
+		"line-height:1.2",
+		"margin:0",
+		"min-height:1.2em"
+	].join(";"));
+}
+
+function isZhishixingqiuBlock(element: Element): boolean {
+	if (element.classList.contains("zhishixingqiu-spacer")) {
+		return false;
+	}
+
+	const tagName = element.tagName.toLowerCase();
+	return [
+		"blockquote",
+		"h1",
+		"h2",
+		"h3",
+		"h4",
+		"h5",
+		"h6",
+		"hr",
+		"img",
+		"ol",
+		"p",
+		"pre",
+		"table",
+		"ul"
+	].includes(tagName) || element.classList.contains("callout");
 }
 
 function removeObsidianRuntimeControls(root: HTMLElement) {

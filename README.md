@@ -1,13 +1,13 @@
 # WeChat Preview Copy
 
-An Obsidian plugin that opens a right-sidebar preview for the active Markdown note and copies rich HTML for WeChat Official Account.
+An Obsidian plugin that opens a right-sidebar preview for the active Markdown note and copies rich HTML for publishing platforms.
 
 ## Features
 
 - Preview the currently active Markdown note in a right sidebar view.
 - Keep the preview synchronized with the active file and editor changes.
 - Copy rendered HTML to the clipboard with inline styles.
-- Apply a target-platform copy profile. The first profile is tuned for WeChat Official Account article layout.
+- Apply a target-platform copy profile. The current profiles are tuned for WeChat Official Account and 知识星球.
 - Embed local vault images as `data:` URLs so the clipboard does not depend on Obsidian local resource paths.
 - Also writes a Markdown/plain-text fallback to the clipboard.
 
@@ -18,6 +18,7 @@ The copy pipeline renders Markdown with Obsidian first, then applies a target-pl
 Current profile:
 
 - `wechat`: WeChat Official Account article layout.
+- `zhishixingqiu`: 知识星球 layout with real spacer paragraphs between blocks, so pasted content is less likely to lose blank lines in the editor.
 
 Future platforms can be added by extending `PLATFORM_PROFILES` in `src/main.ts`.
 
@@ -38,4 +39,4 @@ Reload Obsidian and enable the plugin from Community plugins.
 
 ## Notes
 
-WeChat Official Account paste behavior is controlled by the WeChat editor. This plugin prepares self-contained HTML with embedded local images and inline styles, which is the most portable clipboard format Obsidian can provide without uploading assets to a remote image host.
+Paste behavior is controlled by each target editor. This plugin prepares self-contained HTML with embedded local images and inline styles, which is the most portable clipboard format Obsidian can provide without uploading assets to a remote image host.
